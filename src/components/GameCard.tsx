@@ -1,8 +1,8 @@
 type GameProps = {
   teamA: string
   teamB: string
-  date: string // formato ISO
-  time: string // orario italiano
+  date: string
+  time: string
   round: string
 }
 
