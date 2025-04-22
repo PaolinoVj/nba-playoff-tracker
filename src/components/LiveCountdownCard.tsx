@@ -3,8 +3,16 @@
 
 import { useEffect, useState } from "react"
 
+interface GameData {
+  teamA: string
+  teamALogo?: string
+  teamB: string
+  teamBLogo?: string
+  dateTime: string
+}
+
 export default function LiveCountdownCard({ team }: { team: string }) {
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<GameData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [timeLeft, setTimeLeft] = useState<string>("")
@@ -17,7 +25,7 @@ export default function LiveCountdownCard({ team }: { team: string }) {
 
         if (!res.ok) throw new Error(json.error || "Errore nella richiesta")
 
-        setData(json)
+        setData(json as GameData)
         setLoading(false)
 
         const target = new Date(json.dateTime).getTime()
@@ -41,8 +49,9 @@ export default function LiveCountdownCard({ team }: { team: string }) {
         }, 1000)
 
         return () => clearInterval(interval)
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Errore sconosciuto'
+        setError(message)
         setLoading(false)
       }
     }
@@ -52,6 +61,7 @@ export default function LiveCountdownCard({ team }: { team: string }) {
 
   if (loading) return <div>Caricamento partita di {team}...</div>
   if (error) return <div>Errore: {error}</div>
+  if (!data) return null
 
   return (
     <div className="flex items-center justify-between p-4 border rounded-xl shadow bg-white w-full max-w-3xl mx-auto">
